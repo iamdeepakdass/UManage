@@ -2,6 +2,11 @@ import express from "express";
 import { createClient } from "@supabase/supabase-js";
 import morgan from "morgan";
 import bodyParser from "body-parser";
+import dotenv from "dotenv";
+
+if(process.env.NODE_ENV !== 'production') {
+  dotenv.config();
+}
 
 const app = express();
 
@@ -11,8 +16,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 const supabase = createClient(
-  "https://qqvnykfgyihednzkgygr.supabase.co/",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFxdm55a2ZneWloZWRuemtneWdyIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTk5NzMxMTUsImV4cCI6MjAxNTU0OTExNX0.gZdoppejyhtJXRZw-i8Pvnpg_e6rgYxiodCUTeL2xn8"
+  process.env.SUPABASE_PROJECT_URL,
+  process.env.SUPABASE_APIKEY
 );
 
 app.get("/products", async (req, res) => {
@@ -38,7 +43,10 @@ app.post("/products", async (req, res) => {
   if (error) {
     res.send(error);
   }
-  res.send("created!!");
+  else{
+    res.send("created!!");
+
+  }
 });
 
 app.put("/products/:id", async (req, res) => {
