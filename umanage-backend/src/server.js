@@ -4,7 +4,7 @@ import morgan from "morgan";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
 
-if(process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== "production") {
   dotenv.config();
 }
 
@@ -20,6 +20,11 @@ const supabase = createClient(
   process.env.SUPABASE_APIKEY
 );
 
+app.get("/hello", async (req, res) => {
+  const { data, error } = await supabase.rpc("hello_world");
+  res.send(data);
+});
+
 app.get("/products", async (req, res) => {
   const { data, error } = await supabase.from("products").select();
   res.send(data);
@@ -34,6 +39,42 @@ app.get("/products/:id", async (req, res) => {
   res.send(data);
 });
 
+app.post("/signup", async (req, res) => {
+  try {
+    const { data, error } = await supabase.auth.signUp({
+      email: "iamdeepakdass@gmail.com",
+      password: "Sumit@06",
+    });
+    res.send(error);
+  } catch (e) {
+    res.send(e);
+  }
+});
+
+app.post("/login", async (req, res) => {
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: "iamdeepakdass@gmail.com",
+      password: "Sumit@06",
+    });
+    res.send(error);
+  } catch (e) {
+    res.send(e);
+  }
+});
+
+app.post("/createtable/:tablename", async (req, res) => {
+  const table_name = req.params["tablename"];
+  try {
+    const { data, error } = await supabase.rpc("create_table", {
+      t_name: table_name,
+    });
+    res.send(error);
+  } catch (e) {
+    res.send(e);
+  }
+});
+
 app.post("/products", async (req, res) => {
   const { error } = await supabase.from("products").insert({
     name: req.body.name,
@@ -42,10 +83,8 @@ app.post("/products", async (req, res) => {
   });
   if (error) {
     res.send(error);
-  }
-  else{
+  } else {
     res.send("created!!");
-
   }
 });
 
