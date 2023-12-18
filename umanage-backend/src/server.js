@@ -49,6 +49,29 @@ app.post("/products", async (req, res) => {
   }
 });
 
+app.post("/create",async(req,res)=>{
+  try{
+    const {tableName,columns}=req.body;
+    const createTableSQL=`CREATE TABLE ${tableName} (${columns})`;
+
+    const {error}=await supabase.rpc('execute',{sql:createTableSQL});
+
+    if(error){
+      res.send(error);
+      
+    }
+    else{
+      res.send("table created");
+    }
+    
+  }
+  catch(error){
+    res.send(error);
+    
+  }
+
+});
+
 app.put("/products/:id", async (req, res) => {
   const { error } = await supabase
     .from("products")
