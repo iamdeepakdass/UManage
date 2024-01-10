@@ -39,6 +39,39 @@ app.get("/products/:id", async (req, res) => {
   res.send(data);
 });
 
+app.post('/addprimarykey/:tablename/:columnname',async(req,res)=>{
+  const tableName=req.params["tablename"];
+  const columnName=req.params["columnname"];
+
+  try{
+    const {data,error}= await supabase.rpc("add_primarykey",{
+      t_name:tableName,
+      columnname:columnName,
+
+    });
+    res.send(error);
+  }catch(e){
+    res.send(e);
+  }
+});
+
+
+app.post('/dropprimarykey/:tablename',async(req,res)=>{
+  const tableName=req.params["tablename"];
+
+  try{
+    const {data,error}=await supabase.rpc('drop_primarykey',{
+      t_name:tableName,
+    })
+
+    res.send(error);
+
+  }catch(e){
+    res.send(e);
+  }
+
+});
+
 app.post('/addrow', async (req, res) => {
   const tableName = 't_raghav';
   const columns = ['id', 'subjects'];
