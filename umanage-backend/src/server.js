@@ -39,6 +39,34 @@ app.get("/products/:id", async (req, res) => {
   res.send(data);
 });
 
+app.post('/addrow', async (req, res) => {
+  const tableName = 't_raghav';
+  const columns = ['id', 'subjects'];
+  const data = [1, 'mathematics'];
+
+  try {
+    // Construct the data object
+    const rowData = {};
+    columns.forEach((column, index) => {
+      rowData[column] = data[index];
+    });
+
+    // Insert the row into the specified table
+    const { error } = await supabase
+      .from(tableName)
+      .insert(rowData);
+
+    
+
+    console.log('Row inserted successfully:', rowData);
+    if(error) res.status(500).json({ error: 'Error inserting row', message: error.message });
+    else res.status(200).json({ message: 'Row inserted successfully', data: rowData });
+  } catch (error) {
+    console.error('Error inserting row:', error.message);
+    res.status(500).json({ error: 'Error inserting row', message: error.message });
+  }
+});
+
 app.post("/signup", async (req, res) => {
   try {
     const { data, error } = await supabase.auth.signUp({
