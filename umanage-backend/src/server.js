@@ -42,7 +42,7 @@ app.get("/products/:id", async (req, res) => {
 app.post('/addrow', async (req, res) => {
   const tableName = 't_raghav';
   const columns = ['id', 'subjects'];
-  const data = [1, 'mathematics'];
+  const data = [2, 'mathematics'];
 
   try {
     // Construct the data object
@@ -66,6 +66,60 @@ app.post('/addrow', async (req, res) => {
     res.status(500).json({ error: 'Error inserting row', message: error.message });
   }
 });
+
+app.post('/updaterow', async (req, res) => {
+  const tableName = 't_raghav';
+  const columns = ['id', 'subjects'];
+  const data = [1, 'physics'];
+
+  try {
+    // Construct the data object
+    const rowData = {};
+    columns.forEach((column, index) => {
+      rowData[column] = data[index];
+    });
+
+    // Insert the row into the specified table
+    const { error } = await supabase
+      .from(tableName)
+      .update(rowData)
+      .eq(columns[0], 1);
+
+    
+
+    console.log('Row updated successfully:', rowData);
+    if(error) res.status(500).json({ error: 'Error updating row', message: error.message });
+    else res.status(200).json({ message: 'Row updating successfully', data: rowData });
+  } catch (error) {
+    console.error('Error updating row:', error.message);
+    res.status(500).json({ error: 'Error updating row', message: error.message });
+  }
+});
+
+app.post('/deleterow', async (req, res) => {
+  const tableName = 't_raghav';
+  const columns = ['id'];
+  const id = 2;
+
+  try {
+
+    // Insert the row into the specified table
+    const { error } = await supabase
+      .from(tableName)
+      .delete()
+      .eq(columns[0], id);
+
+    
+
+    console.log('Row deleted successfully!');
+    if(error) res.status(500).json({ error: 'Error deleting row', message: error.message });
+    else res.status(200).json({ message: 'Row deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting row:', error.message);
+    res.status(500).json({ error: 'Error deleting row', message: error.message });
+  }
+});
+
 
 app.post("/signup", async (req, res) => {
   try {
