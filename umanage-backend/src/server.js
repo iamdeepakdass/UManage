@@ -74,6 +74,129 @@ app.post("/createtable/:tablename", async (req, res) => {
     res.send(e);
   }
 });
+app.post("/droptable/:tablename", async (req, res) => {
+  const table_name = req.params["tablename"];
+  try {
+    const { data, error } = await supabase.rpc("drop_table", {
+      t_name: table_name,
+    });
+    res.send(error);
+  } catch (e) {
+    res.send(e);
+  }
+});
+app.post("/showcolumn/:tablename", async (req, res) => {
+  const table_name = req.params["tablename"];
+  try {
+    const { data, error } = await supabase.rpc("show_columns", {
+      t_name: table_name,
+    });
+    res.send(data);
+  } catch (e) {
+    res.send(e);
+  }
+});
+
+app.post("/renamecolumn/:tablename/:columnname/:rename", async (req, res) => {
+  const table_name = req.params["tablename"];
+  const column_name = req.params["columnname"];
+  const re_name = req.params["rename"];
+
+  try {
+    const { data, error } = await supabase.rpc("rename_column", {
+      t_name: table_name,
+      columnname: column_name,
+      renamedname: re_name,
+    });
+    res.send(error);
+  } catch (e) {
+    res.send(e);
+  }
+});
+
+app.post("/dropcolumn/:tablename/:columnname", async (req, res) => {
+  const table_name = req.params["tablename"];
+  const column_name = req.params["columnname"];
+
+  try {
+    const { data, error } = await supabase.rpc("drop_column", {
+      t_name: table_name,
+      columnname: column_name,
+    });
+    res.send(error);
+  } catch (e) {
+    res.send(e);
+  }
+});
+
+app.post("/addcolumn/:tablename/:columnname/:dtype", async (req, res) => {
+  const table_name = req.params["tablename"];
+  const column_name = req.params["columnname"];
+  const data_type = req.params["dtype"];
+
+  try {
+    const { data, error } = await supabase.rpc("add_column", {
+      t_name: table_name,
+      columnname: column_name,
+      datatype: data_type,
+    });
+    res.send(error);
+  } catch (e) {
+    res.send(e);
+  }
+});
+
+app.post("/altercolumn/:tablename/:columnname/:dtype", async (req, res) => {
+  const table_name = req.params["tablename"];
+  const column_name = req.params["columnname"];
+  const data_type = req.params["dtype"];
+
+  try {
+    const { data, error } = await supabase.rpc("alter_column_datatype", {
+      t_name: table_name,
+      columnname: column_name,
+      datatype: data_type,
+    });
+    res.send(error);
+  } catch (e) {
+    res.send(e);
+  }
+});
+
+app.post("/insert/:tablename", async (req, res) => {
+  async function insertRow(tableName, columnNames, columnData) {
+    try {
+      const data = {};
+
+      // Create an object with column names as keys and corresponding data
+      for (let i = 0; i < columnNames.length; i++) {
+        data[columnNames[i]] = columnData[i];
+      }
+
+      // Insert the data into the specified table
+      const { data: insertedRow, error } = await supabase
+        .from(tableName)
+        .upsert([data]);
+
+      if (error) {
+        console.error("Error inserting row:", error.message);
+      } else {
+        console.log("Row inserted successfully:", insertedRow);
+      }
+    } catch (error) {
+      console.error("Error:", error.message);
+    }
+  }
+
+  const table_name=req.params["tablename"];
+  const column_name=["id","subjects"];
+  const data=["1","math"];
+
+  await insertRow(table_name,column_name,data);
+
+
+
+});
 
 app.post("/products", async (req, res) => {
   const { error } = await supabase.from("products").insert({
@@ -88,27 +211,21 @@ app.post("/products", async (req, res) => {
   }
 });
 
-app.post("/create",async(req,res)=>{
-  try{
-    const {tableName,columns}=req.body;
-    const createTableSQL=`CREATE TABLE ${tableName} (${columns})`;
+app.post("/create", async (req, res) => {
+  try {
+    const { tableName, columns } = req.body;
+    const createTableSQL = `CREATE TABLE ${tableName} (${columns})`;
 
-    const {error}=await supabase.rpc('execute',{sql:createTableSQL});
+    const { error } = await supabase.rpc("execute", { sql: createTableSQL });
 
-    if(error){
+    if (error) {
       res.send(error);
-      
-    }
-    else{
+    } else {
       res.send("table created");
     }
-    
-  }
-  catch(error){
+  } catch (error) {
     res.send(error);
-    
   }
-
 });
 
 app.put("/products/:id", async (req, res) => {
