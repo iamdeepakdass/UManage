@@ -3,6 +3,8 @@ import { createClient } from "@supabase/supabase-js";
 import morgan from "morgan";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
+import cors from "cors";
+
 
 if (process.env.NODE_ENV !== "production") {
   dotenv.config();
@@ -11,6 +13,9 @@ if (process.env.NODE_ENV !== "production") {
 const app = express();
 
 app.use(morgan("combined"));
+app.use(cors({
+  origin: 'http://localhost:3000'
+}));
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -25,19 +30,30 @@ app.get("/hello", async (req, res) => {
   res.send(data);
 });
 
-app.get("/products", async (req, res) => {
-  const { data, error } = await supabase.from("products").select();
+app.get("/table/:table", async (req, res) => {
+  const table = req.params.table;
+  const { data, error } = await supabase.from(table).select();
   res.send(data);
 });
 
-app.get("/products/:id", async (req, res) => {
+app.get("/table/:table/:id", async (req, res) => {
+  const table = req.params.table;
   const { data, error } = await supabase
-    .from("products")
+    .from(table)
     .select()
     .eq("id", req.params.id);
   console.log(error);
   res.send(data);
 });
+
+app.get("/getTableNames", async (req, res) => {
+  try{
+    const {data, error} = await supabase.rpc("get_table_names");
+    res.send(data);
+  } catch(e) {
+    res.send(e);
+  }
+}) 
 
 app.post('/addprimarykey/:tablename/:columnname',async(req,res)=>{
   const tableName=req.params["tablename"];
@@ -377,6 +393,8 @@ app.get("*", (req, res) => {
   res.send("Hello again I am working my friend to the moon and behind <3");
 });
 
-app.listen(3000, () => {
-  console.log("This app is running on http://localhost:3000");
+const port = 8000
+
+app.listen(port, () => {
+  console.log(`This app is running on http://localhost:${port}`);
 });
