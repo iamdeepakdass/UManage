@@ -4,11 +4,8 @@ import { Menu } from "@headlessui/react";
 import Table from "./table";
 import { Bars3Icon, HomeIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import axios from "axios";
-import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { CiMenuKebab } from "react-icons/ci";
-// import { Fragment, } from 'react'
 import { Dialog, Transition } from "@headlessui/react";
-// import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 
 const navigation = [
   { name: "Add New Table", href: "#", icon: HomeIcon, current: true },
@@ -23,11 +20,11 @@ function getTableStructre(name: string, id: number) {
 }
 
 export default function Dashboard() {
+  
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [listOfTables, setListOfTables] = useState<any[]>([]);
   const [isOpen, setOpen] = useState(false);
   const [isAddNewTable,setisAddNewTable] = useState(false);
-
   const [selectedTable, setSelectedTable] = useState("");
 
   useEffect(() => {
@@ -309,7 +306,7 @@ export default function Dashboard() {
               </div>
             </Dialog>
           </Transition.Root>
-        ) }
+        )}
 
         <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
           <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-slate-400 px-6">

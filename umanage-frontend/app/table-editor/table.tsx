@@ -1,8 +1,6 @@
 /* eslint-disable react/jsx-key */
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { IoMdArrowDropdown } from "react-icons/io";
-import { MdKeyboardArrowDown } from "react-icons/md";
 import { Fragment } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
@@ -94,7 +92,6 @@ export default function Table(props: any) {
           <tr>
             {columns.map((columnName: string) => {
               return (
-                // eslint-disable-next-line react/jsx-key
                 <th scope="col" className="px-6 py-3">
                   <span className="flex">
                     <p className="flex flex-1">{columnName} </p> <span>DataType</span>
