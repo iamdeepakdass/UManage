@@ -41,6 +41,11 @@ export default function Dashboard() {
     })();
   }, []);
 
+
+  async function deleteTable(tableName: string){
+    await axios.post("http://localhost:8000/droptable/"+tableName)
+  }
+
   return (
     <>
       <div>
@@ -416,7 +421,8 @@ export default function Dashboard() {
                                     </Menu.Item>
                                     <Menu.Item>
                                       {({ active }) => (
-                                        <a
+                                        <a onClick={()=>{deleteTable(table.name)}}
+        
                                           href="#"
                                           className={classNames(
                                             active
