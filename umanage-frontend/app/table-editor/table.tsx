@@ -16,7 +16,6 @@ export default function Table(props: any) {
 
   useEffect(() => {
     (async () => {
-      const error = await axios.post("http://localhost:8000/login");
       const { data } = await axios.get(
         `http://localhost:8000/table/${tableName}`
       );
