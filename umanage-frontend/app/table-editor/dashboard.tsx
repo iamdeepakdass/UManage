@@ -7,9 +7,7 @@ import axios from "axios";
 import { CiMenuKebab } from "react-icons/ci";
 import { Dialog, Transition } from "@headlessui/react";
 
-const navigation = [
-  { name: "Add New Table", href: "#", icon: HomeIcon, current: true },
-];
+
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
@@ -24,9 +22,11 @@ export default function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [listOfTables, setListOfTables] = useState<any[]>([]);
   const [isOpen, setOpen] = useState(false);
-  const [isAddNewTable,setisAddNewTable] = useState(false);
+  const [isAddNewTable,setisAddNewTable] = useState(true);
   const [selectedTable, setSelectedTable] = useState("");
-
+  const navigation = [
+    { name: "Add New Table", href: "#", onclick:function setModelOpen() { setisAddNewTable(true) } , icon: HomeIcon, current: true },
+  ];
   useEffect(() => {
     (async () => {
       const error = await axios.post("http://localhost:8000/login");
@@ -113,6 +113,7 @@ export default function Dashboard() {
                             {navigation.map((item) => (
                               <li key={item.name}>
                                 <div
+                                  onClick={() => item.onclick()}
                                   className={classNames(
                                     item.current
                                       ? "bg-slate-700 text-white"
@@ -290,14 +291,14 @@ export default function Dashboard() {
                             <button
                               type="button"
                               className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
-                              onClick={() => setOpen(false)}
+                              onClick={() => setisAddNewTable(false)}
                             >
                               Cancel
                             </button>
                             <button
                               type="button"
                               className="mt-3 inline-flex w-full justify-center rounded-md px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto bg-green-500 ml-3"
-                              onClick={() => setOpen(false)}
+                              onClick={() => setisAddNewTable(false)}
                             >
                               Save
                             </button>
@@ -329,6 +330,7 @@ export default function Dashboard() {
                     {navigation.map((item) => (
                       <li key={item.name}>
                         <div
+                          onClick={() => item.onclick()}
                           className={classNames(
                             item.current
                               ? "bg-slate-700 text-white"
