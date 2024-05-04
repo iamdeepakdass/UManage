@@ -329,6 +329,21 @@ app.post("/insert/:tablename", async (req, res) => {
 
 });
 
+app.post("/createPolicy/:tablename", async(req, res) => {
+  const tableName = req.body.tablename;
+  const policyName = tableName + " ki policy";
+
+  try {
+    const {data, error} = await supabase.rpc("create_birju_policy", {
+      policy_name: policyName,
+      table_name: tableName
+    });
+    res.send(error);
+  } catch(e) {
+    res.send(e);
+  }
+})
+
 app.post("/products", async (req, res) => {
   const { error } = await supabase.from("products").insert({
     name: req.body.name,

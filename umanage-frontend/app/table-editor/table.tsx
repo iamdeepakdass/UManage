@@ -19,8 +19,9 @@ export default function Table(props: any) {
       const { data } = await axios.get(
         `http://localhost:8000/table/${tableName}`
       );
-      console.log(data);
-      setColumns(Object.keys(data[0]));
+
+   
+      if(data[0]) setColumns(Object.keys(data[0]));
       const allRows: any = [];
       data.forEach((r: any) => {
         allRows.push(Object.values(r));
