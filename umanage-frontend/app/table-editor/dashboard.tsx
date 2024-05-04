@@ -6,7 +6,8 @@ import { Bars3Icon, HomeIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import axios from "axios";
 import { CiMenuKebab } from "react-icons/ci";
 import { Dialog, Transition } from "@headlessui/react";
-
+import CreateColumns from "./columnField";
+import { CiCircleMinus } from "react-icons/ci";
 
 
 function classNames(...classes: string[]) {
@@ -18,12 +19,14 @@ function getTableStructre(name: string, id: number) {
 }
 
 export default function Dashboard() {
-  
+  const [createColumns, setCreateColumns] = useState([{key:0, name:"", type:"", primary:false}]);
+  const [columnCount, setColumnCount] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [listOfTables, setListOfTables] = useState<any[]>([]);
   const [isOpen, setOpen] = useState(false);
-  const [isAddNewTable,setisAddNewTable] = useState(true);
+  const [isAddNewTable,setisAddNewTable] = useState(false);
   const [selectedTable, setSelectedTable] = useState("");
+  const [tableName, setTableName] = useState("");
   const navigation = [
     { name: "Add New Table", href: "#", onclick:function setModelOpen() { setisAddNewTable(true) } , icon: HomeIcon, current: true },
   ];
@@ -41,9 +44,27 @@ export default function Dashboard() {
     })();
   }, []);
 
-
+  async function handleCreateTable(event: any) {
+    event.preventDefault();
+    await axios.post("http://localhost:8000/createtable/" + tableName);
+    await axios.post("http://localhost:8000/createPolicy/" + tableName);
+    setisAddNewTable(false);
+  }
   async function deleteTable(tableName: string){
     await axios.post("http://localhost:8000/droptable/"+tableName)
+  }
+
+  function handleAddColumn() {
+    setCreateColumns([...createColumns, {key: columnCount + 1, name:"", type:"", primary:false}]);
+    const newCount = columnCount + 1;
+    setColumnCount(newCount);
+  }
+
+  function handleRemoveColumn(e:any, removeIndex: number) {
+    e.preventDefault();
+    let newCreateColumns = [...createColumns];
+    newCreateColumns.splice(removeIndex, 1);
+    setCreateColumns(newCreateColumns);
   }
 
   return (
@@ -223,6 +244,8 @@ export default function Dashboard() {
                                     className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
                                     id="inline-full-name"
                                     type="text"
+                                    name="table_name"
+                                    onChange={(e) => {setTableName(e.target.value)}}
                                   />
                                 </div>
                                 <div className="flex">
@@ -234,6 +257,7 @@ export default function Dashboard() {
                                   <textarea
                                     className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
                                     id="inline-full-name"
+                                    name="table_description"
                                   />
                                 </div>
                               </div>
@@ -241,50 +265,19 @@ export default function Dashboard() {
                             <hr className="h-px my-8 bg-gray-400 border-0 dark:bg-gray-700" />
                             {/* columns  */}
                             <div>Columns</div>
-                            <div className="flex mt-2">
-                              <div>
-                                <label className="block text-gray-500 font-bold mb-1 md:mb-0 pr-4">
-                                  Name
-                                </label>
-                                <input
-                                  className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
-                                  id="inline-full-name"
-                                  type="text"
-                                />
+                            {createColumns.map((column, index: number) => {
+                              return <div key={`form_${column.key}`}>
+                                <CreateColumns Name={column.name} Type={column.type} Primary={column.primary} Key={column.key} index={index} handleChange={function(columnDetails: any, ind: number) {
+                                  const newCreateColumns = [...createColumns];
+                                  
+                                  newCreateColumns[ind] = columnDetails;
+                                  console.log(newCreateColumns);
+                                  setCreateColumns(newCreateColumns);
+                                }}></CreateColumns>
+                                <CiCircleMinus width="15px" onClick={(e) => {handleRemoveColumn(e, index)}}/>
                               </div>
-                              <div className="ml-2">
-                                <label className="block text-gray-500 font-bold mb-1 md:mb-0 pr-4">
-                                  Type
-                                </label>
-                                <input
-                                  className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
-                                  id="inline-full-name"
-                                  type="text"
-                                />
-                              </div>
-                              <div className="ml-2">
-                                <label className="block text-gray-500 font-bold mb-1 md:mb-0 pr-4">
-                                  Default Value
-                                </label>
-                                <input
-                                  className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
-                                  id="inline-full-name"
-                                  type="text"
-                                />
-                              </div>
-                              <div className="ml-2">
-                                <label className="block text-gray-500 font-bold mb-1 md:mb-0 pr-4">
-                                  Primary
-                                </label>
-                                <input
-                                  id="default-checkbox"
-                                  type="checkbox"
-                                  value=""
-                                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                                />
-                              </div>
-                            </div>
-                            <div className="text-center mt-2 text-sm">Add Column</div>
+                            })}
+                            <div className="text-center mt-2 text-sm" onClick={handleAddColumn}>Add Column</div>
                             <hr className="h-px my-8 bg-gray-400 border-0 dark:bg-gray-700" />
                             {/* foreign keys */}
                             <div className="flex">
@@ -298,7 +291,7 @@ export default function Dashboard() {
                             <button
                               type="button"
                               className="mt-3 inline-flex w-full justify-center rounded-md px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto bg-green-500 ml-3"
-                              onClick={() => setisAddNewTable(false)}
+                              onClick={(e) => handleCreateTable(e)}
                             >
                               Save
                             </button>
